@@ -41,7 +41,7 @@ public class App {
                 .annualIncome(22000)
                 .creditScore(480)
                 .employmentType(EmploymentType.UNEMPLOYED)
-                .existingMonthlyDebt(900)
+                .existingMonthlyDebt(1200)
                 .requestedLoanAmount(50000)
                 .build();
 
@@ -59,8 +59,8 @@ public class App {
                 .annualIncome(30000)
                 .creditScore(610)
                 .employmentType(EmploymentType.SELF_EMPLOYED)
-                .existingMonthlyDebt(700)
-                .requestedLoanAmount(60000)
+                .existingMonthlyDebt(1400)
+                .requestedLoanAmount(145000)
                 .build();
 
         List<RuleResult> results3 = ruleEngine.evaluate(applicant3);
