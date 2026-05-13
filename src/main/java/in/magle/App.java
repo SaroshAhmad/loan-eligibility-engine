@@ -1,39 +1,71 @@
 package in.magle;
 
-import in.magle.model.ApplicantProfile;
-import in.magle.model.EmploymentType;
 
+import in.magle.engine.RuleEngine;
+import in.magle.engine.ScoringEngine;
+import in.magle.model.ApplicantProfile;
+import in.magle.model.DecisionResult;
+import in.magle.model.EmploymentType;
+import in.magle.model.RuleResult;
+
+import java.util.List;
 
 public class App {
     public static void main(String[] args) {
-        ApplicantProfile profile = new ApplicantProfile.Builder()
+        RuleEngine    ruleEngine    = new RuleEngine();
+        ScoringEngine scoringEngine = new ScoringEngine();
+
+        // --- Applicant 1: Strong profile, should be APPROVED ---
+        ApplicantProfile applicant1 = new ApplicantProfile.Builder()
                 .applicantId("APP-001")
                 .fullName("Ahmad Khan")
                 .age(28)
-                .annualIncome(35000)
-                .creditScore(720)
+                .annualIncome(45000)
+                .creditScore(780)
                 .employmentType(EmploymentType.FULL_TIME)
-                .existingMonthlyDebt(400)
+                .existingMonthlyDebt(300)
                 .requestedLoanAmount(15000)
                 .build();
 
-        System.out.println(profile);
+        List<RuleResult> results1 = ruleEngine.evaluate(applicant1);
+        DecisionResult decision1  = scoringEngine.decide(applicant1.getApplicantId(), results1);
+        decision1.printReport();
 
-        // Now test that validation works
-        try {
-            ApplicantProfile invalid = new ApplicantProfile.Builder()
-                    .applicantId("APP-002")
-                    .fullName("Bad Applicant")
-                    .age(15)          // Invalid: under 18
-                    .annualIncome(30000)
-                    .creditScore(600)
-                    .employmentType(EmploymentType.FULL_TIME)
-                    .existingMonthlyDebt(200)
-                    .requestedLoanAmount(10000)
-                    .build();
-        } catch (IllegalArgumentException e) {
-            System.out.println("Caught expected validation error: " + e.getMessage());
-        }
+        System.out.println();
+
+        // --- Applicant 2: Weak profile, should be DECLINED ---
+        ApplicantProfile applicant2 = new ApplicantProfile.Builder()
+                .applicantId("APP-002")
+                .fullName("Jane Smith")
+                .age(45)
+                .annualIncome(22000)
+                .creditScore(480)
+                .employmentType(EmploymentType.UNEMPLOYED)
+                .existingMonthlyDebt(900)
+                .requestedLoanAmount(50000)
+                .build();
+
+        List<RuleResult> results2 = ruleEngine.evaluate(applicant2);
+        DecisionResult decision2  = scoringEngine.decide(applicant2.getApplicantId(), results2);
+        decision2.printReport();
+
+        System.out.println();
+
+        // --- Applicant 3: Borderline profile, should be REFERRED ---
+        ApplicantProfile applicant3 = new ApplicantProfile.Builder()
+                .applicantId("APP-003")
+                .fullName("Carlos Rivera")
+                .age(35)
+                .annualIncome(30000)
+                .creditScore(610)
+                .employmentType(EmploymentType.SELF_EMPLOYED)
+                .existingMonthlyDebt(700)
+                .requestedLoanAmount(60000)
+                .build();
+
+        List<RuleResult> results3 = ruleEngine.evaluate(applicant3);
+        DecisionResult decision3  = scoringEngine.decide(applicant3.getApplicantId(), results3);
+        decision3.printReport();
     }
 }
 
